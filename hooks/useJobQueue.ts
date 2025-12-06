@@ -11,14 +11,14 @@ import { DEFAULT_ESTIMATED_JOB_TIME_MS, STORAGE_KEY } from '../constants';
 
 const formatDuration = (ms: number): string => {
     // Simplified for brevity, logic identical to original
-    if (ms <= 0) return "0 秒";
+    if (ms <= 0) return "0 s";
     const seconds = Math.floor(ms / 1000) % 60;
     const minutes = Math.floor(ms / (1000 * 60)) % 60;
     const hours = Math.floor(ms / (1000 * 3600));
     const parts = [];
-    if (hours > 0) parts.push(`${hours} 小时`);
-    if (minutes > 0) parts.push(`${minutes} 分`);
-    parts.push(`${seconds} 秒`);
+    if (hours > 0) parts.push(`${hours} h`);
+    if (minutes > 0) parts.push(`${minutes} m`);
+    parts.push(`${seconds} s`);
     return parts.join(" ");
 };
 
@@ -60,7 +60,7 @@ export const useJobQueue = (
             }
         } catch (e) {
             console.error("Failed to load jobs", e);
-            addLog("无法恢复之前的任务列表", 'error');
+            addLog("Failed to restore previous job list", 'error');
         }
     }, [addLog]);
 
@@ -125,7 +125,7 @@ export const useJobQueue = (
         setStopRequested(false);
         // Queue start time removed as it was unused logic
 
-        addLog("任务队列已启动", 'info');
+        addLog("Job queue started", 'info');
 
         const processQueue = async () => {
             while (processingRef.current) {
@@ -140,7 +140,7 @@ export const useJobQueue = (
 
                 if (pendingJobs.length === 0 && activeCount === 0) {
                     setIsProcessing(false);
-                    addLog("所有任务处理完成", 'success');
+                    addLog("All jobs completed", 'success');
                     break;
                 }
 
@@ -254,10 +254,10 @@ export const useJobQueue = (
         try {
             await clearJobStore(); // Clears IndexedDB content
             localStorage.removeItem(STORAGE_KEY);
-            addLog("任务列表已清空", 'info');
+            addLog("Job list cleared", 'info');
             refreshStorageEstimate();
         } catch (e) {
-            addLog("清空任务失败", 'error');
+            addLog("Failed to clear jobs", 'error');
         }
     }, [addLog, refreshStorageEstimate]);
 
@@ -270,7 +270,7 @@ export const useJobQueue = (
     const toggleProcessing = useCallback(() => {
         if (isProcessing) {
             setStopRequested(true);
-            addLog("正在停止队列...", 'info');
+            addLog("Stopping queue...", 'info');
         } else {
             setIsProcessing(true);
         }

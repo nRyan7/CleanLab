@@ -68,10 +68,10 @@ const LiveMonitor: React.FC<LiveMonitorProps> = ({
           <div className="flex items-center gap-4 flex-grow-0"> {/* Use flex-grow-0 to prevent it from taking too much space */}
             <div className="flex items-center gap-3">
               <Icons.Preview className="w-5 h-5 text-indigo-400" />
-              <span className="font-bold text-zinc-200 tracking-wide text-lg whitespace-nowrap">任务输出</span> {/* Prevent wrapping */}
+              <span className="font-bold text-zinc-200 tracking-wide text-lg whitespace-nowrap">Output</span> {/* Prevent wrapping */}
               {isGlobalProcessing && ( // Only show if processing
                 <span className="text-xs font-medium text-zinc-500 ml-4 whitespace-nowrap">
-                  模型: <span className="text-indigo-400 font-mono">{currentModelName}</span>
+                  Model: <span className="text-indigo-400 font-mono">{currentModelName}</span>
                 </span>
               )}
             </div>
@@ -93,13 +93,13 @@ const LiveMonitor: React.FC<LiveMonitorProps> = ({
               <div className="flex items-center justify-end text-[10px] font-medium text-zinc-500 gap-4 mb-1"> {/* Align text to right */}
                 {isGlobalProcessing && ( // Only show if global processing is active
                   <span>
-                    运行时长: <span className="text-zinc-300 font-mono">{elapsedProcessingTimeString}</span>
+                    Duration: <span className="text-zinc-300 font-mono">{elapsedProcessingTimeString}</span>
                   </span>
                 )}
-                <span>总进度: <span className="text-indigo-400 font-mono">{queueProgress.toFixed(0)}%</span></span>
+                <span>Total: <span className="text-indigo-400 font-mono">{queueProgress.toFixed(0)}%</span></span>
                 {totalJobsCount > 0 && isGlobalProcessing && (
                   <span>
-                    预估剩余: <span className="text-zinc-300 font-mono">{estimatedRemainingTimeString}</span> {/* Prevent wrapping */}
+                    Est. Remaining: <span className="text-zinc-300 font-mono">{estimatedRemainingTimeString}</span> {/* Prevent wrapping */}
                   </span>
                 )}
               </div>
@@ -126,7 +126,7 @@ const LiveMonitor: React.FC<LiveMonitorProps> = ({
               </div>
               <div className="prose prose-invert prose-zinc max-w-none">
                 {/* Render a placeholder or initial empty state */}
-                {!activeJob.rewrittenText && <span className="text-zinc-600 italic animate-pulse">等待模型响应...</span>}
+                {!activeJob.rewrittenText && <span className="text-zinc-600 italic animate-pulse">Waiting for model response...</span>}
                 {/* This div will be updated directly by the ref */}
                 <div ref={rewrittenTextContentRef} />
                 <span className="inline-block w-2 h-5 bg-indigo-500 align-middle ml-1 animate-pulse" />
@@ -138,8 +138,8 @@ const LiveMonitor: React.FC<LiveMonitorProps> = ({
                 <Icons.Terminal className="w-10 h-10 opacity-20" />
               </div>
               <div className="text-center space-y-1">
-                <p className="text-lg font-medium text-zinc-500">等待任务</p>
-                <p className="text-sm text-zinc-700">请在左侧列表添加文件并开始处理</p>
+                <p className="text-lg font-medium text-zinc-500">Waiting for Jobs</p>
+                <p className="text-sm text-zinc-700">Add files or folders to start processing</p>
               </div>
             </div>
           )}
@@ -156,7 +156,7 @@ const LiveMonitor: React.FC<LiveMonitorProps> = ({
           ref={logScrollRef}
           className="flex-1 p-4 overflow-y-auto font-mono text-sm space-y-2 custom-scrollbar"
         >
-          {logs.length === 0 && <div className="text-gray-600 italic px-3">系统日志准备就绪...</div>}
+          {logs.length === 0 && <div className="text-gray-600 italic px-3">System logs ready...</div>}
           {logs.map((log) => (
             <div key={log.id} className="flex gap-4 px-3 py-1 hover:bg-white/5 rounded group">
               <span className="text-gray-600 select-none flex-shrink-0 w-24 text-right opacity-60 group-hover:opacity-100 transition-opacity">

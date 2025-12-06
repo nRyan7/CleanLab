@@ -30,21 +30,65 @@ const DatasetCleanerModal: React.FC<DatasetCleanerModalProps> = ({ isOpen, onClo
         if (!file) return;
 
         setIsProcessing(true);
-        setStatus('正在读取文件...');
+        setStatus('Reading file...');
         setProgress(10);
 
         try {
             const text = await file.text();
-            setStatus('正在清洗格式...');
+            setStatus('Cleaning format...');
             setProgress(30);
+
+            // Helper to clean string values
+            const cleanString = (str: string): string => {
+                let cleaned = str;
+                // 1. Unescape literal \n (common in scraped data)
+                cleaned = cleaned.replace(/\\n/g, '\n');
+
+                // 2. Remove Markdown syntax
+                cleaned = cleaned.replace(/\*\*/g, ''); // Bold
+                cleaned = cleaned.replace(/#{2,}\s/g, ''); // Header (## )
+                cleaned = cleaned.replace(/^-{3,}/gm, ''); // Divider (---)
+                cleaned = cleaned.replace(/`{3,}/g, ''); // Code blocks delimiters
+
+                // 3. Remove all spaces (User request: "文章中的空格也要删除")
+                // Removes standard space and full-width space
+                cleaned = cleaned.replace(/[ 　]/g, '');
+
+                return cleaned;
+            };
+
+            // Recursive helper to clean all strings in an object/array
+            const cleanObject = (obj: any): any => {
+                if (typeof obj === 'string') {
+                    return cleanString(obj);
+                }
+                if (Array.isArray(obj)) {
+                    return obj.map(item => cleanObject(item));
+                }
+                if (obj !== null && typeof obj === 'object') {
+                    const newObj: any = {};
+                    for (const key in obj) {
+                        if (Object.prototype.hasOwnProperty.call(obj, key)) {
+                            newObj[key] = cleanObject(obj[key]);
+                        }
+                    }
+                    return newObj;
+                }
+                return obj;
+            };
 
             // 1. Split by lines
             const lines = text.split(/\r?\n/);
             const cleanedLines: string[] = [];
             const totalLines = lines.length;
 
+            // Regex for weird characters (Control chars, Replacement char, Zero-width space, BOM)
+            // Excludes: \x09 (Tab), \x0A (LF), \x0D (CR)
+            const WEIRD_CHARS_REGEX = /[\x00-\x08\x0B\x0C\x0E-\x1F\uFFFD\u200B\uFEFF]/g;
+
             for (let i = 0; i < totalLines; i++) {
-                let line = lines[i].trim();
+                // Pre-clean: trim and remove weird characters
+                let line = lines[i].replace(WEIRD_CHARS_REGEX, '').trim();
 
                 if (i % 1000 === 0) {
                     await new Promise(r => setTimeout(r, 0));
@@ -70,7 +114,10 @@ const DatasetCleanerModal: React.FC<DatasetCleanerModalProps> = ({ isOpen, onClo
 
                 try {
                     // First, try to parse the line as JSON
-                    const obj = JSON.parse(line);
+                    let obj = JSON.parse(line);
+
+                    // Apply recursive cleaning to the object
+                    obj = cleanObject(obj);
 
                     // Check if it matches the specific wrapper pattern: { "text": "..." }
                     // And the content inside "text" looks like a JSON object (starts with {)
@@ -105,7 +152,10 @@ const DatasetCleanerModal: React.FC<DatasetCleanerModalProps> = ({ isOpen, onClo
                                 }
 
                                 try {
-                                    const innerObj = JSON.parse(lineToParse);
+                                    let innerObj = JSON.parse(lineToParse);
+                                    // Clean inner object too
+                                    innerObj = cleanObject(innerObj);
+
                                     // Validate it has "messages" or looks like what we want?
                                     // For now just valid JSON object is enough
                                     if (typeof innerObj === 'object' && innerObj !== null) {
@@ -123,7 +173,8 @@ const DatasetCleanerModal: React.FC<DatasetCleanerModalProps> = ({ isOpen, onClo
 
                             // If splitting didn't work, try parsing the whole block
                             try {
-                                const innerObj = JSON.parse(innerContent);
+                                let innerObj = JSON.parse(innerContent);
+                                innerObj = cleanObject(innerObj);
                                 if (typeof innerObj === 'object' && innerObj !== null) {
                                     cleanedLines.push(JSON.stringify(innerObj));
                                     continue;
@@ -147,8 +198,9 @@ const DatasetCleanerModal: React.FC<DatasetCleanerModalProps> = ({ isOpen, onClo
                     if (line.endsWith(',')) {
                         const fixedLine = line.slice(0, -1);
                         try {
-                            JSON.parse(fixedLine);
-                            cleanedLines.push(fixedLine);
+                            let obj = JSON.parse(fixedLine);
+                            obj = cleanObject(obj);
+                            cleanedLines.push(JSON.stringify(obj));
                             continue;
                         } catch (e2) {
                             // Still invalid
@@ -162,12 +214,12 @@ const DatasetCleanerModal: React.FC<DatasetCleanerModalProps> = ({ isOpen, onClo
             }
 
             if (cleanedLines.length === 0) {
-                setStatus('未找到有效的 JSONL 内容');
+                setStatus('No valid JSONL content found');
                 setIsProcessing(false);
                 return;
             }
 
-            setStatus(`已清洗 ${cleanedLines.length} 行数据，正在生成文件...`);
+            setStatus(`Cleaned ${cleanedLines.length} lines, generating file...`);
             setProgress(90);
 
             const outputContent = cleanedLines.join('\n');
@@ -177,12 +229,12 @@ const DatasetCleanerModal: React.FC<DatasetCleanerModalProps> = ({ isOpen, onClo
             setDownloadUrl(url);
             setCleanedFileName(`cleaned_dataset_${new Date().getTime()}.jsonl`);
 
-            setStatus(`完成！共清洗 ${cleanedLines.length} 条数据。`);
+            setStatus(`Done! Cleaned ${cleanedLines.length} entries.`);
             setProgress(100);
 
         } catch (error) {
             console.error(error);
-            setStatus('处理出错: ' + (error as any).message);
+            setStatus('Error: ' + (error as any).message);
         } finally {
             setIsProcessing(false);
         }
@@ -194,7 +246,7 @@ const DatasetCleanerModal: React.FC<DatasetCleanerModalProps> = ({ isOpen, onClo
                 <div className="flex justify-between items-center mb-4">
                     <h2 className="text-xl font-bold text-white flex items-center gap-2">
                         <Icons.Eraser className="w-5 h-5 text-blue-400" />
-                        语料格式清洗工具
+                        Dataset Format Cleaner
                     </h2>
                     <button onClick={onClose} className="text-gray-400 hover:text-white">
                         <Icons.X className="w-6 h-6" />
@@ -214,10 +266,10 @@ const DatasetCleanerModal: React.FC<DatasetCleanerModalProps> = ({ isOpen, onClo
                             onClick={() => fileInputRef.current?.click()}
                             className="px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-600 transition-colors"
                         >
-                            {file ? file.name : "选择文件"}
+                            {file ? file.name : "Select File"}
                         </button>
                         <p className="text-gray-400 text-sm mt-2">
-                            支持 .jsonl, .txt (自动去除 Markdown、逗号，提取内容)
+                            Supports .jsonl, .txt (Auto-removes Markdown, commas, extracts content)
                         </p>
                     </div>
 
@@ -240,7 +292,7 @@ const DatasetCleanerModal: React.FC<DatasetCleanerModalProps> = ({ isOpen, onClo
                             onClick={onClose}
                             className="px-4 py-2 text-gray-300 hover:text-white transition-colors"
                         >
-                            取消
+                            Cancel
                         </button>
 
                         {downloadUrl ? (
@@ -250,7 +302,7 @@ const DatasetCleanerModal: React.FC<DatasetCleanerModalProps> = ({ isOpen, onClo
                                 className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-500 transition-colors flex items-center gap-2"
                             >
                                 <Icons.Download className="w-4 h-4" />
-                                下载清洗后文件
+                                Download Cleaned File
                             </a>
                         ) : (
                             <button
@@ -262,7 +314,7 @@ const DatasetCleanerModal: React.FC<DatasetCleanerModalProps> = ({ isOpen, onClo
                                     }`}
                             >
                                 <Icons.Eraser className="w-4 h-4" />
-                                {isProcessing ? '清洗中...' : '开始清洗'}
+                                {isProcessing ? 'Cleaning...' : 'Start Cleaning'}
                             </button>
                         )}
                     </div>

@@ -31,12 +31,12 @@ const CorpusSplitterModal: React.FC<CorpusSplitterModalProps> = ({ isOpen, onClo
         if (!file) return;
 
         setIsProcessing(true);
-        setStatus('正在读取文件...');
+        setStatus('Reading file...');
         setProgress(10);
 
         try {
             const text = await file.text();
-            setStatus('正在解析内容...');
+            setStatus('Parsing content...');
             setProgress(30);
 
             const zip = new JSZip();
@@ -48,7 +48,7 @@ const CorpusSplitterModal: React.FC<CorpusSplitterModalProps> = ({ isOpen, onClo
             // Strategy 1: Try JSONL (Line by line)
             // This is efficient and handles the "v2-data.jsonl" case best if it's standard JSONL.
             const lines = text.split(/\r?\n/);
-            let isJsonl = false;
+
 
             // Heuristic check for JSONL: check first few non-empty lines
             let validJsonCount = 0;
@@ -64,8 +64,7 @@ const CorpusSplitterModal: React.FC<CorpusSplitterModalProps> = ({ isOpen, onClo
             }
 
             if (validJsonCount > 0) {
-                isJsonl = true;
-                setStatus('检测到 JSONL 格式，正在逐行处理...');
+                setStatus('Detected JSONL format, processing line by line...');
 
                 for (let i = 0; i < lines.length; i++) {
                     const line = lines[i].trim();
@@ -93,15 +92,13 @@ const CorpusSplitterModal: React.FC<CorpusSplitterModalProps> = ({ isOpen, onClo
 
             // Strategy 2: Fallback to marker search if not JSONL or no results found
             if (count === 0) {
-                setStatus('尝试使用标记解析...');
+                setStatus('Attempting marker-based parsing...');
                 let idx = 0;
                 // Support both unquoted {text: and quoted {"text":
                 // We'll look for "text" followed by colon
                 const regex = /\{[\s\n]*("text"|text|'text')[\s\n]*:/g;
 
-                let match;
-                while ((match = regex.exec(text)) !== null) {
-                    const startPos = match.index;
+                while (regex.exec(text) !== null) {
 
                     if (count % 100 === 0) {
                         await new Promise(r => setTimeout(r, 0));
@@ -145,12 +142,12 @@ const CorpusSplitterModal: React.FC<CorpusSplitterModalProps> = ({ isOpen, onClo
             }
 
             if (count === 0) {
-                setStatus('未找到符合格式的内容 (支持 JSONL 或 {text:...})');
+                setStatus('No compatible content found (supports JSONL or {text:...})');
                 setIsProcessing(false);
                 return;
             }
 
-            setStatus(`已拆分 ${count} 篇文章，正在打包...`);
+            setStatus(`Split ${count} articles, creating zip...`);
             setProgress(90);
 
             const content = await zip.generateAsync({ type: "blob" });
@@ -158,12 +155,12 @@ const CorpusSplitterModal: React.FC<CorpusSplitterModalProps> = ({ isOpen, onClo
             setDownloadUrl(url);
             setZipFileName(`corpus_split_${new Date().getTime()}.zip`);
 
-            setStatus(`完成！共拆分 ${count} 个文件。`);
+            setStatus(`Done! Split into ${count} files.`);
             setProgress(100);
 
         } catch (error) {
             console.error(error);
-            setStatus('处理出错: ' + (error as any).message);
+            setStatus('Error: ' + (error as any).message);
         } finally {
             setIsProcessing(false);
         }
@@ -173,7 +170,7 @@ const CorpusSplitterModal: React.FC<CorpusSplitterModalProps> = ({ isOpen, onClo
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
             <div className="bg-gray-800 p-6 rounded-lg shadow-xl w-full max-w-md border border-gray-700">
                 <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-xl font-bold text-white">语料文件拆分工具</h2>
+                    <h2 className="text-xl font-bold text-white">Corpus Splitter Tool</h2>
                     <button onClick={onClose} className="text-gray-400 hover:text-white">
                         <Icons.X className="w-6 h-6" />
                     </button>
@@ -192,10 +189,10 @@ const CorpusSplitterModal: React.FC<CorpusSplitterModalProps> = ({ isOpen, onClo
                             onClick={() => fileInputRef.current?.click()}
                             className="px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-600 transition-colors"
                         >
-                            {file ? file.name : "选择文件"}
+                            {file ? file.name : "Select File"}
                         </button>
                         <p className="text-gray-400 text-sm mt-2">
-                            支持 .txt, .json 格式 (需包含 &#123;text: ...&#125; 结构)
+                            Supports .txt, .json formats (containing &#123;text: ...&#125; structure)
                         </p>
                     </div>
 
@@ -218,7 +215,7 @@ const CorpusSplitterModal: React.FC<CorpusSplitterModalProps> = ({ isOpen, onClo
                             onClick={onClose}
                             className="px-4 py-2 text-gray-300 hover:text-white transition-colors"
                         >
-                            取消
+                            Cancel
                         </button>
 
                         {downloadUrl ? (
@@ -231,7 +228,7 @@ const CorpusSplitterModal: React.FC<CorpusSplitterModalProps> = ({ isOpen, onClo
                                 }}
                             >
                                 <Icons.Download className="w-4 h-4" />
-                                下载 ZIP
+                                Download ZIP
                             </a>
                         ) : (
                             <button
@@ -242,7 +239,7 @@ const CorpusSplitterModal: React.FC<CorpusSplitterModalProps> = ({ isOpen, onClo
                                     : 'bg-blue-600 text-white hover:bg-blue-500'
                                     }`}
                             >
-                                {isProcessing ? '处理中...' : '开始拆分'}
+                                {isProcessing ? 'Processing...' : 'Start Splitting'}
                             </button>
                         )}
                     </div>

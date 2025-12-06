@@ -107,12 +107,12 @@ const JobCard: React.FC<JobCardProps> = ({ job, onRetry, onRemove }) => {
               {/* Changed text-sm to text-xs, and adjusted widths for better fit */}
               <div className="text-[10px] opacity-70 flex items-center gap-2 text-zinc-400 font-mono">
                 {/* Use job.originalTextLength directly */}
-                <span className="flex-shrink-0">原:{job.originalTextLength ?? '-'}</span>
+                <span className="flex-shrink-0">Orig:{job.originalTextLength ?? '-'}</span>
 
                 {/* Use job.rewrittenTextLength directly */}
                 <span className="flex-shrink-0">
-                  {job.rewrittenTextLength !== undefined && job.rewrittenTextLength > 0 ? `→ 改:${job.rewrittenTextLength}` : (
-                    job.status === JobStatus.PROCESSING && job.rewrittenText?.length !== undefined && job.rewrittenText.length > 0 ? `→ 改:${job.rewrittenText.length}` : ''
+                  {job.rewrittenTextLength !== undefined && job.rewrittenTextLength > 0 ? `→ New:${job.rewrittenTextLength}` : (
+                    job.status === JobStatus.PROCESSING && job.rewrittenText?.length !== undefined && job.rewrittenText.length > 0 ? `→ New:${job.rewrittenText.length}` : ''
                   )}
                 </span>
                 <span className={`flex-shrink-0 text-indigo-300`}>
@@ -126,7 +126,7 @@ const JobCard: React.FC<JobCardProps> = ({ job, onRetry, onRemove }) => {
             <button
               onClick={() => setExpanded(!expanded)}
               className="p-2.5 hover:bg-white/15 rounded-md transition-colors text-gray-300"
-              title="查看详情"
+              title="View Details"
             >
               {expanded ? <Icons.ChevronUp className="w-5 h-5" /> : <Icons.ChevronDown className="w-5 h-5" />}
             </button>
@@ -135,7 +135,7 @@ const JobCard: React.FC<JobCardProps> = ({ job, onRetry, onRemove }) => {
               <button
                 onClick={() => onRetry(job.id)}
                 className="p-2.5 hover:bg-blue-600/20 rounded-md transition-colors text-blue-300"
-                title="重试"
+                title="Retry"
               >
                 <Icons.Retry className="w-5 h-5" />
               </button>
@@ -151,7 +151,7 @@ const JobCard: React.FC<JobCardProps> = ({ job, onRetry, onRemove }) => {
               }}
               // Removed 'relative' and direct z-index
               className={`p-2.5 rounded-md transition-colors text-red-400 cursor-pointer ${isRemoving ? 'bg-red-600/50' : 'hover:bg-red-600/20'}`}
-              title="删除"
+              title="Delete"
             >
               <Icons.Trash className="w-5 h-5" />
             </button>
@@ -161,14 +161,14 @@ const JobCard: React.FC<JobCardProps> = ({ job, onRetry, onRemove }) => {
         {/* Explicit Error Box (Always visible if failed) */}
         {job.status === JobStatus.FAILED && job.error && (
           <div className="mt-4 p-3 bg-red-900/40 border border-red-500/30 rounded-lg text-xs text-red-200 font-mono break-all">
-            <span className="font-bold text-red-400">[错误]</span> {job.error}
+            <span className="font-bold text-red-400">[ERROR]</span> {job.error}
           </div>
         )}
 
         {/* Validation Warning Box */}
         {job.status === JobStatus.VALIDATION_FAILED && job.validationErrors && (
           <div className="mt-4 p-3 bg-orange-900/40 border border-orange-500/30 rounded-lg text-xs text-orange-200">
-            <span className="font-bold text-orange-400">[警告]</span> {job.validationErrors.join(", ")}
+            <span className="font-bold text-orange-400">[WARN]</span> {job.validationErrors.join(", ")}
           </div>
         )}
 
@@ -187,19 +187,19 @@ const JobCard: React.FC<JobCardProps> = ({ job, onRetry, onRemove }) => {
       {expanded && (
         <div className="border-t border-white/10 p-5 bg-black/20 grid grid-cols-1 md:grid-cols-2 gap-5 animate-in fade-in slide-in-from-top-1">
           <div className="flex flex-col gap-2">
-            <span className="text-xs uppercase tracking-wider text-gray-500 font-semibold">原文预览</span>
+            <span className="text-xs uppercase tracking-wider text-gray-500 font-semibold">Original Comparison</span>
             <textarea
               readOnly
               className="w-full h-52 bg-gray-900/50 border border-gray-700 rounded-lg p-3 text-xs text-gray-300 font-mono resize-none focus:outline-none custom-scrollbar"
-              value={loadingContent ? "(加载中...)" : (previewOriginalText || "(内容不可用)")}
+              value={loadingContent ? "(Loading...)" : (previewOriginalText || "(No Content)")}
             />
           </div>
           <div className="flex flex-col gap-2">
-            <span className="text-xs uppercase tracking-wider text-gray-500 font-semibold">改写预览</span>
+            <span className="text-xs uppercase tracking-wider text-gray-500 font-semibold">Rewritten Output</span>
             <textarea
               readOnly
               className="w-full h-52 bg-gray-900/50 border border-gray-700 rounded-lg p-3 text-xs text-gray-300 font-mono resize-none focus:outline-none custom-scrollbar"
-              value={loadingContent ? "(加载中...)" : (previewRewrittenText || "(等待生成/内容不可用)")}
+              value={loadingContent ? "(Loading...)" : (previewRewrittenText || "(Pending/No Content)")}
             />
           </div>
         </div>

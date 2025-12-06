@@ -19,7 +19,7 @@ import PromptModal from './components/PromptModal';
 import CorpusSplitterModal from './components/CorpusSplitterModal';
 import DatasetCleanerModal from './components/DatasetCleanerModal';
 
-import JSZip from 'jszip'; // Added for download functionality
+
 
 const App: React.FC = () => {
   // --- Hooks ---
@@ -68,12 +68,11 @@ const App: React.FC = () => {
     const completedJobs = jobs.filter(j => j.status === JobStatus.COMPLETED);
 
     if (completedJobs.length === 0) {
-      alert("没有可下载的已完成任务。");
+      alert("No completed jobs available for download.");
       return;
     }
 
-    const zip = new JSZip();
-    const folder = zip.folder("rewritten_corpus");
+    const jsonlLines: string[] = [];
 
     // Use for...of loop to handle async await correctly
     for (const job of completedJobs) {
@@ -89,24 +88,28 @@ const App: React.FC = () => {
       }
 
       if (content) {
-        folder?.file(job.fileName, content);
+        // Format as JSONL line: { "text": "content" }
+        // Ensure content is properly escaped by JSON.stringify
+        jsonlLines.push(JSON.stringify({ text: content }));
       }
     }
 
-    if (Object.keys(folder?.files || {}).length === 0) {
-      alert("虽然有已完成的任务，但无法获取其内容（可能已丢失或损坏）。");
+    if (jsonlLines.length === 0) {
+      alert("There are completed jobs, but their content could not be retrieved (possibly lost or corrupted).");
       return;
     }
 
-    const content = await zip.generateAsync({ type: "blob" });
-    const url = URL.createObjectURL(content);
+    // Create a Blob from the JSONL lines joined by newlines
+    const blob = new Blob([jsonlLines.join('\n')], { type: 'application/x-jsonlines' });
+    const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `corpus_refined_${new Date().getTime()}.zip`;
+    // Filename: corpus_refined_[timestamp].jsonl
+    link.download = `corpus_refined_${new Date().getTime()}.jsonl`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    addLog(`已下载 ${completedJobs.length} 个文件的处理结果`, 'success');
+    addLog(`Downloaded results for ${jsonlLines.length} files as JSONL`, 'success');
   };
 
   const activeJob = jobs.find(j => j.status === JobStatus.PROCESSING);
@@ -133,6 +136,7 @@ const App: React.FC = () => {
         onToggleProcessing={toggleProcessing}
         onClearAll={() => setShowClearConfirm(true)}
         onDownloadResults={handleDownloadResults}
+        currentModelName={settings.provider === 'local' ? settings.localModelName : settings.geminiModelName}
       />
 
       {/* Warning Banners (Absolute or inside main) */}
@@ -209,8 +213,8 @@ const App: React.FC = () => {
 
       <ConfirmationModal
         isOpen={showClearConfirm}
-        title="清空所有任务"
-        message="确定要清空所有任务吗？这将删除所有已导入的文件和处理结果，且无法撤销。"
+        title="Clear All Jobs"
+        message="Are you sure you want to clear all jobs? This will delete all imported files and results, and cannot be undone."
         onConfirm={() => {
           clearJobs();
           setShowClearConfirm(false);

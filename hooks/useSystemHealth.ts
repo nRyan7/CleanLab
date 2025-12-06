@@ -33,9 +33,9 @@ export const useSystemHealth = (addLog: (msg: string, type: any) => void) => {
             // setCorruptionHintMessage(null); // Optional: clear hint on success?
         } catch (error) {
             const e = error as DOMException;
-            let hint = `警告: 获取存储状态失败: ${e.message || '未知错误'}。本地数据存储可能已损坏。`;
+            let hint = `Warning: Failed to get storage status: ${e.message || 'Unknown Error'}. Local storage might be corrupted.`;
             if (e.name === 'QuotaExceededError') {
-                hint = `警告: 获取存储状态失败，存储已满。`;
+                hint = `Warning: Failed to get storage status, storage full.`;
             }
             addLog(hint, 'error');
             setCorruptionHintMessage(hint);
@@ -49,9 +49,9 @@ export const useSystemHealth = (addLog: (msg: string, type: any) => void) => {
         try {
             const logs = await getCrashLogs();
             setCrashLogsDisplayed(logs);
-            addLog(`已加载 ${logs.length} 条崩溃日志`, 'info');
+            addLog(`Loaded ${logs.length} crash logs`, 'info');
         } catch (error) {
-            addLog(`加载崩溃日志失败: ${(error as any).message}`, 'error');
+            addLog(`Failed to load crash logs: ${(error as any).message}`, 'error');
         } finally {
             setIsRefreshingCrashLogs(false);
         }
@@ -61,10 +61,10 @@ export const useSystemHealth = (addLog: (msg: string, type: any) => void) => {
         try {
             await clearCrashLogsService();
             setCrashLogsDisplayed([]);
-            addLog("所有崩溃日志已清空。", 'success');
+            addLog("All crash logs cleared.", 'success');
             refreshStorageEstimate();
         } catch (error) {
-            addLog(`清空崩溃日志失败: ${(error as any).message}`, 'error');
+            addLog(`Failed to clear crash logs: ${(error as any).message}`, 'error');
         }
     };
 
@@ -72,7 +72,7 @@ export const useSystemHealth = (addLog: (msg: string, type: any) => void) => {
     useEffect(() => {
         // Initialize DB
         openJobStore().then(() => {
-            addLog("系统初始化完成", 'info');
+            addLog("System initialized", 'info');
             refreshStorageEstimate();
 
             // Check crash marker
@@ -80,17 +80,17 @@ export const useSystemHealth = (addLog: (msg: string, type: any) => void) => {
             if (lastCrashMarker) {
                 try {
                     const crashInfo = JSON.parse(lastCrashMarker);
-                    const msg = `上次应用崩溃，时间：${new Date(crashInfo.timestamp).toLocaleString()}，消息：${crashInfo.message || '未知'}`;
+                    const msg = `App crashed last time at: ${new Date(crashInfo.timestamp).toLocaleString()}. Message: ${crashInfo.message || 'Unknown'}`;
                     addLog(msg, 'error');
-                    setCorruptionHintMessage("警告: 上次应用崩溃。这可能导致本地数据损坏。");
+                    setCorruptionHintMessage("Warning: App crashed last time. Local data might be corrupted.");
                     localStorage.removeItem(CRASH_MARKER_KEY);
                 } catch (e) {
                     console.error("Failed to parse crash marker");
                 }
             }
         }).catch(e => {
-            addLog(`IndexedDB 初始化失败: ${e.message}`, 'error');
-            setCorruptionHintMessage(`警告: 数据存储初始化失败 (${e.message})`);
+            addLog(`IndexedDB Initialization failed: ${e.message}`, 'error');
+            setCorruptionHintMessage(`Warning: Storage init failed (${e.message})`);
         });
 
         // Error Listeners
@@ -108,7 +108,7 @@ export const useSystemHealth = (addLog: (msg: string, type: any) => void) => {
             };
 
             putCrashLog(crashLog).then(() => {
-                addLog('捕获到未处理的错误并已记录。', 'error');
+                addLog('Captured unhandled error and logged.', 'error');
             }).catch(() => {
                 // Fallback to localStorage
                 try {
@@ -131,7 +131,7 @@ export const useSystemHealth = (addLog: (msg: string, type: any) => void) => {
                 stack: reason instanceof Error ? reason.stack : undefined,
             };
             putCrashLog(crashLog).then(() => {
-                addLog('捕获到未处理的 Promise 拒绝并已记录。', 'error');
+                addLog('Captured unhandled Promise rejection and logged.', 'error');
             }).catch(() => {
                 try {
                     localStorage.setItem(CRASH_MARKER_KEY, JSON.stringify({

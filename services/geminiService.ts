@@ -60,7 +60,7 @@ export const testLocalConnection = async (baseUrl: string): Promise<{ success: b
   if (window.location.protocol === 'https:' && cleanUrl.startsWith('http:')) {
     return {
       success: false,
-      message: "【环境错误】您正在 HTTPS 网站上访问 HTTP 本地服务。浏览器已拦截请求。请将项目下载到本地运行 (npm run dev)。"
+      message: "[Environment Error] You are accessing a local HTTP service from an HTTPS site. The browser has blocked the request. Please download the project and run it locally (npm run dev)."
     };
   }
 
@@ -77,13 +77,13 @@ export const testLocalConnection = async (baseUrl: string): Promise<{ success: b
 
       return {
         success: true,
-        message: `连接成功！发现 ${modelCount} 个已加载模型。`,
+        message: `Connection successful! Found ${modelCount} loaded models.`,
         models: models
       };
     } else {
       return {
         success: false,
-        message: `服务已连接但返回错误: ${response.status} ${response.statusText}。请检查服务日志。`
+        message: `Service connected but returned error: ${response.status} ${response.statusText}. Please check service logs.`
       };
     }
   } catch (error: any) {
@@ -92,24 +92,24 @@ export const testLocalConnection = async (baseUrl: string): Promise<{ success: b
       if (baseUrl.includes('11434')) {
         return {
           success: false,
-          message: "连接失败 (Ollama)。如果是 CORS 问题，请停止 Ollama，并在终端运行: OLLAMA_ORIGINS=\"*\" ollama serve"
+          message: "Connection failed (Ollama). If CORS issue, stop Ollama and run: OLLAMA_ORIGINS=\"*\" ollama serve"
         };
       }
       // Check if it looks like LM Studio port
       if (baseUrl.includes('1234')) {
         return {
           success: false,
-          message: "连接失败 (LM Studio)。如果是 CORS 问题，请在终端运行: lms server start --cors"
+          message: "Connection failed (LM Studio). If CORS issue, run: lms server start --cors"
         };
       }
       return {
         success: false,
-        message: "连接失败。请检查：1. 服务是否已启动？ 2. CORS 是否允许？"
+        message: "Connection failed. Please check: 1. Service started? 2. CORS enabled?"
       };
     }
     return {
       success: false,
-      message: `发生未知错误: ${error.message}`
+      message: `Unknown error occurred: ${error.message}`
     };
   }
 };
@@ -128,7 +128,7 @@ const processChunk = async (
   // --- STRATEGY: GEMINI (REST API) ---
   if (settings.provider === 'gemini') {
     if (!settings.apiKey) {
-      throw new Error("请在设置中配置 Gemini API Key");
+      throw new Error("Please configure Gemini API Key in settings");
     }
 
     const API_KEY = settings.apiKey;
@@ -268,18 +268,18 @@ const processChunk = async (
         const isLocalHttp = settings.localBaseUrl.startsWith('http:');
 
         if (isHttps && isLocalHttp) {
-          throw new Error("【HTTPS 混合内容阻挡】无法从 HTTPS 网页连接到 HTTP 本地服务。请下载代码到本地运行。");
+          throw new Error("[HTTPS Mixed Content Block] Cannot connect to HTTP local service from HTTPS site. Please run locally.");
         }
 
         if (settings.localBaseUrl.includes('11434')) {
-          throw new Error("Ollama 连接失败 (CORS)。请关闭 Ollama，然后在终端运行: OLLAMA_ORIGINS=\"*\" ollama serve");
+          throw new Error("Ollama Connection Failed (CORS). Stop Ollama and run: OLLAMA_ORIGINS=\"*\" ollama serve");
         }
 
         if (settings.localBaseUrl.includes('1234')) {
-          throw new Error("LM Studio 连接失败 (CORS)。请在终端运行: lms server start --cors");
+          throw new Error("LM Studio Connection Failed (CORS). Run: lms server start --cors");
         }
 
-        throw new Error("无法连接到本地模型。请检查：1. 服务正在运行？ 2. 模型已加载？ 3. CORS 已开启？");
+        throw new Error("Cannot connect to local model. Check: 1. Service running? 2. Model loaded? 3. CORS enabled?");
       }
 
       throw error;

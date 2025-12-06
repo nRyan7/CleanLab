@@ -50,7 +50,7 @@ export const useSettings = (addLog: (message: string, type: 'info' | 'error' | '
 
         } catch (e) {
             console.error("Failed to load settings", e);
-            addLog("无法加载设置，将使用默认值", 'error');
+            addLog("Failed to load settings, using defaults", 'error');
         }
     }, [addLog]);
 
@@ -60,7 +60,7 @@ export const useSettings = (addLog: (message: string, type: 'info' | 'error' | '
             localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
         } catch (e) {
             console.error("Failed to save settings", e);
-            addLog("无法保存设置到本地存储", 'error');
+            addLog("Failed to save settings to local storage", 'error');
         }
     }, [settings, addLog]);
 
@@ -79,7 +79,7 @@ export const useSettings = (addLog: (message: string, type: 'info' | 'error' | '
                 setAvailableModels(result.models);
             }
         } catch (e: any) {
-            setTestResultMessage(`❌ 发生错误: ${e.message}`);
+            setTestResultMessage(`❌ Error: ${e.message}`);
         } finally {
             setIsTestingConnection(false);
         }

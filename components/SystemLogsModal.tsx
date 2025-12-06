@@ -27,7 +27,7 @@ export const SystemLogsModal: React.FC<SystemLogsModalProps> = ({
                 <div className="p-6 border-b border-gray-100 flex items-center justify-between">
                     <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
                         <Icons.FileText className="w-5 h-5 text-red-500" />
-                        系统崩溃日志
+                        System Crash Logs
                     </h2>
                     <div className="flex items-center gap-2">
                         <button
@@ -47,7 +47,7 @@ export const SystemLogsModal: React.FC<SystemLogsModalProps> = ({
                     {logs.length === 0 ? (
                         <div className="h-64 flex flex-col items-center justify-center text-gray-400">
                             <Icons.Check className="w-12 h-12 mb-2 text-green-500" />
-                            <p>没有检测到崩溃日志</p>
+                            <p>No crash logs detected</p>
                         </div>
                     ) : (
                         <div className="space-y-4">
@@ -76,14 +76,14 @@ export const SystemLogsModal: React.FC<SystemLogsModalProps> = ({
                 </div>
 
                 <div className="p-4 border-t border-gray-100 bg-white flex justify-between items-center">
-                    <span className="text-xs text-gray-500">仅显示最近记录。严重错误会自动保存到本地 IndexedDB。</span>
+                    <span className="text-xs text-gray-500">Only showing recent logs. Critical errors are auto-saved to IndexedDB.</span>
                     {logs.length > 0 && (
                         <button
                             onClick={onClear}
                             className="flex items-center gap-2 px-4 py-2 border border-red-200 text-red-600 rounded-lg hover:bg-red-50 text-sm font-medium transition-colors"
                         >
                             <Icons.Trash className="w-4 h-4" />
-                            清空所有日志
+                            Clear All Logs
                         </button>
                     )}
                 </div>

@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { Job, JobStatus } from '../types';
 import { putJobContent } from '../services/jobStore';
 
@@ -18,13 +18,13 @@ export const useFileHandler = (
         const textFiles = files.filter(f => f.name.toLowerCase().endsWith('.txt'));
 
         if (textFiles.length === 0) {
-            addLog(`未找到txt文件 (总共 ${files.length} 个文件)`, 'warning');
+            addLog(`No .txt files found (Total ${files.length} files)`, 'warning');
             return;
         }
 
         setIsUploading(true);
         setUploadProgress(0);
-        addLog(`开始处理 ${textFiles.length} 个文件...`, 'info');
+        addLog(`Started processing ${textFiles.length} files...`, 'info');
 
         const CHUNK_SIZE = 50;
         const totalFiles = textFiles.length;
@@ -92,7 +92,7 @@ export const useFileHandler = (
 
         setIsUploading(false);
         setUploadProgress(0);
-        addLog(`成功添加 ${processedCount} 个文件至队列`, 'success');
+        addLog(`Successfully added ${processedCount} files to queue`, 'success');
         refreshStorageEstimate();
     }, [addJobs, addLog, refreshStorageEstimate, existingJobs]);
 

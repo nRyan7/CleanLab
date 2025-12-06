@@ -19,8 +19,8 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   message,
   onConfirm,
   onCancel,
-  confirmButtonText = '确认',
-  cancelButtonText = '取消',
+  confirmButtonText = 'Confirm',
+  cancelButtonText = 'Cancel',
   confirmButtonClass = 'bg-red-600 hover:bg-red-500',
   cancelButtonClass = 'bg-gray-700 hover:bg-gray-600',
 }) => {

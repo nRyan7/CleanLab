@@ -29,33 +29,57 @@ export const JobQueue: React.FC<JobQueueProps> = ({
 
     return (
         <div className="bg-transparent flex flex-col h-full w-full">
-            <div className="px-4 py-3 border-b border-white/5 flex items-center justify-between bg-white/5 backdrop-blur-md">
-                <h3 className="font-semibold text-zinc-300 text-sm flex items-center gap-2">
-                    <Icons.List className="w-4 h-4 text-zinc-500" />
-                    任务列表
-                    <span className="bg-indigo-500/10 text-indigo-400 px-1.5 py-0.5 rounded text-[10px] font-mono border border-indigo-500/20 leading-none">
+            <div className="px-4 py-4 border-b border-white/5 flex flex-col gap-3 bg-white/5 backdrop-blur-md">
+                <h3 className="font-semibold text-zinc-200 text-sm flex items-center justify-between w-full">
+                    <div className="flex items-center gap-2">
+                        <Icons.List className="w-4 h-4 text-zinc-500" />
+                        Job List
+                    </div>
+                    <span className="bg-zinc-800 text-zinc-400 px-2 py-0.5 rounded-md text-xs font-mono border border-white/5">
                         {filteredJobs.length}
                     </span>
                 </h3>
 
-                <div className="flex bg-black/20 p-1 rounded-lg border border-white/5">
-                    {(['all', 'pending', 'completed', 'failed'] as const).map((f) => (
-                        <button
-                            key={f}
-                            onClick={() => onFilterChange(f)}
-                            className={`px-3 py-1 text-[10px] font-medium rounded-md transition-all ${filter === f
-                                ? 'bg-indigo-500/20 text-indigo-300 shadow-sm border border-indigo-500/30'
-                                : 'text-zinc-500 hover:text-zinc-300 hover:bg-white/5'
-                                }`}
-                        >
-                            {{
-                                all: '全部',
-                                pending: '待办',
-                                completed: '完成',
-                                failed: '失败'
-                            }[f]}
-                        </button>
-                    ))}
+                <div className="grid grid-cols-4 gap-2 bg-black/20 p-1 rounded-lg border border-white/5 w-full">
+                    {(['all', 'pending', 'completed', 'failed'] as const).map((f) => {
+                        const isActive = filter === f;
+                        let activeClass = '';
+                        let inactiveClass = 'text-zinc-500 hover:bg-white/5';
+
+                        switch (f) {
+                            case 'all':
+                                activeClass = 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/20';
+                                break;
+                            case 'pending':
+                                activeClass = 'bg-amber-500/20 text-amber-500 border border-amber-500/20';
+                                inactiveClass = 'text-zinc-500 hover:text-amber-500 hover:bg-amber-500/10';
+                                break;
+                            case 'completed':
+                                activeClass = 'bg-emerald-500/20 text-emerald-500 border border-emerald-500/20';
+                                inactiveClass = 'text-zinc-500 hover:text-emerald-500 hover:bg-emerald-500/10';
+                                break;
+                            case 'failed':
+                                activeClass = 'bg-red-500/20 text-red-500 border border-red-500/20';
+                                inactiveClass = 'text-zinc-500 hover:text-red-500 hover:bg-red-500/10';
+                                break;
+                        }
+
+                        return (
+                            <button
+                                key={f}
+                                onClick={() => onFilterChange(f)}
+                                className={`px-2 py-1.5 text-[10px] font-medium rounded-md transition-all flex justify-center items-center ${isActive ? activeClass : inactiveClass
+                                    }`}
+                            >
+                                {{
+                                    all: 'All',
+                                    pending: 'Pending',
+                                    completed: 'Done',
+                                    failed: 'Failed'
+                                }[f]}
+                            </button>
+                        );
+                    })}
                 </div>
             </div>
 
@@ -63,7 +87,7 @@ export const JobQueue: React.FC<JobQueueProps> = ({
                 {filteredJobs.length === 0 ? (
                     <div className="h-full flex flex-col items-center justify-center text-zinc-600 gap-2">
                         <Icons.List className="w-10 h-10 opacity-20" />
-                        <p className="text-xs font-medium">暂无任务</p>
+                        <p className="text-xs font-medium">No Jobs</p>
                     </div>
                 ) : (
                     filteredJobs.map(job => (

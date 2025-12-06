@@ -1,5 +1,6 @@
-# CleanLab - LLM Corpus Refinement System
-# CleanLab - LLMコーパス精製システム
+# ⚡️ CleanLab - Corpus Refinery
+
+**CleanLab** is a specialized, local-first web application designed for refining, cleaning, and rewriting large text corpora for LLM training. Built with modern web technologies, it ensures privacy, speed, and reliability.
 
 [English](#english) | [日本語](#japanese)
 
@@ -8,97 +9,106 @@
 <a name="english"></a>
 ## 🇺🇸 English
 
-### Introduction
-**CleanLab** is a powerful web-based application designed to streamline the process of cleaning, rewriting, and refining text corpora for Large Language Model (LLM) training. It leverages advanced LLMs (like Google Gemini and local models via generic APIs) to process text data autonomously based on custom system prompts.
+### 🌟 Introduction
+Preparing high-quality training data is the most critical step in building great LLMs. **CleanLab** automates this process by orchestrating AI models (Google Gemini or Local LLMs) to rewrite, format, and enhance your raw text data.
 
-### Key Features
-*   **LLM-Powered Rewriting**: Automatically rewrite, summarize, or format text files using state-of-the-art AI models.
-*   **Robust Job Queue**: Efficiently manages massive datasets with a concurrent job processing system.
-*   **Persistent Storage**: Uses IndexedDB to safely store progress and results locally. Even if the browser crashes, your data is safe.
-*   **Live Monitoring**: Real-time status updates, processing speed estimation, and detailed logs.
-*   **Flexible Inputs**: Supports single file and batch folder uploads.
-*   **Downloadable Results**: Export processed data as a ZIP archive with a single click.
-*   **Customizable Settings**: Configure API endpoints, models, system prompts, and concurrency levels.
+### ✨ Key Features
+*   **🤖 AI-Powered Refinement**: Automatically rewrite messy text into high-quality, structured content using custom system prompts.
+*   **🧹 Dataset Cleaner**: Built-in tool to strip "weird" symbols (control chars, zero-width spaces) and remove Markdown artifacts (`**`, `##`) from your data.
+*   **✂️ Corpus Splitter**: Utility to split massive text files into manageable chunks for processing.
+*   **🚀 Robust Queue System**: Multi-threaded job queue capable of handling thousands of files without browser lag.
+*   **💾 Auto-Save & Resume**: All progress is saved to IndexedDB. Browser crashed? No problem. Resume exactly where you left off.
+*   **📥 JSONL Export**: Downloads results in standard `.jsonl` format (`{"text": "..."}`), ready for immediate fine-tuning.
+*   **🔌 Flexible Backend**:
+    *   **Google Gemini**: fast and high-quality cloud processing.
+    *   **Local LLMs**: Support for Ollama, LM Studio, and vLLM (OpenAI-compatible).
 
-### Getting Started
+### 🚀 Getting Started
 
 #### Prerequisites
-*   Node.js (v18 or higher)
+*   Node.js (v18+)
 *   npm or yarn
 
 #### Installation
-1.  Clone the repository:
+1.  **Clone the repository**
     ```bash
     git clone https://github.com/nRyan7/CleanLab.git
     cd CleanLab
     ```
-2.  Install dependencies:
+2.  **Install dependencies**
     ```bash
     npm install
     ```
 
-#### Configuration
-You can configure the AI provider in the **Settings** menu within the app.
-*   **Gemini API**: Requires a valid API Key.
-*   **Local/Generic API**: Compatible with OpenAI-style endpoints (e.g., LM Studio, Ollama, vLLM).
-
 #### Usage
-1.  Start the development server:
+1.  **Start the app**
     ```bash
     npm run dev
     ```
-2.  Open your browser and navigate to `http://localhost:5173`.
-3.  **Configure**: Open "Settings" to set your API Key and System Prompt.
-4.  **Upload**: Click "Upload Files" or "Upload Folder" to add your raw text data.
-5.  **Process**: Click the "Run" button to start the queue.
-6.  **Download**: Once finished, click the "Download" button to get your refined dataset.
+2.  **Open in browser**: Go to `http://localhost:5173`
+3.  **Configure**:
+    *   Click the **Settings** icon.
+    *   Choose **Gemini** (provide API Key) or **Local** (provide base URL).
+4.  **Load Data**: Drop files or folders into the UI.
+5.  **Run**: Click **Start Processing**.
+6.  **Export**: Click **Download** to get your clean `.jsonl` dataset.
+
+### ⚠️ License & Commercial Use
+This project is strictly for **learning and research purposes only**.
+If you wish to use it for **commercial purposes**, you must contact the author for authorization: **ranrinhk@gmail.com**
 
 ---
 
 <a name="japanese"></a>
 ## 🇯🇵 日本語
 
-### はじめに
-**CleanLab** は、大規模言語モデル（LLM）のトレーニング用に使用するテキストコーパスを効率的にクリーニング、書き換え、精製するために設計された強力なWebアプリケーションです。Google Gemini やローカルモデル（汎用API経由）などの高度なLLMを活用し、カスタムプロンプトに基づいてテキストデータを自律的に処理します。
+### 🌟 はじめに
+**CleanLab** は、LLMトレーニング用のテキストコーパスを洗練・整形・クリーニングするために設計された、ローカルファーストのWebアプリケーションです。プライバシーと効率を重視し、大量のデータをブラウザ上で快適に処理します。
 
-### 主な機能
-*   **LLMによる自動書き換え**: 最先端のAIモデルを使用して、テキストファイルを自動的に書き換え、要約、またはフォーマットします。
-*   **堅牢なジョブキュー**: 並行処理システムにより、大量のデータセットを効率的に管理します。
-*   **永続的ストレージ**: IndexedDBを使用して、進捗状況と結果をローカルに安全に保存します。ブラウザがクラッシュしても、データは安全です。
-*   **ライブモニタリング**: リアルタイムのステータス更新、処理速度の推定、および詳細なログを提供します。
-*   **柔軟な入力**: 単一ファイルおよびフォルダの一括アップロードをサポートします。
-*   **結果のダウンロード**: 処理されたデータをワンクリックでZIPアーカイブとしてエクスポートできます。
-*   **カスタマイズ可能な設定**: APIエンドポイント、モデル、システムプロンプト、同時実行数を自由に設定できます。
+### ✨ 主な機能
+*   **🤖 AIによる自動精製**: カスタムプロンプトを使用し、乱雑なテキストを高品質な学習用データに書き換えます。
+*   **🧹 データセットクリーナー**: 制御文字やゼロ幅スペースなどの「謎の記号」、Markdown記法（`**`, `##`）を自動除去するツールを搭載。
+*   **✂️ コーパス分割ツール**: 巨大なテキストファイルを処理しやすいサイズに分割するユーティリティ。
+*   **🚀 堅牢なジョブキュー**: 数千ファイルの処理もブラウザを重くすることなく、並列で効率的に実行します。
+*   **💾 自動保存と再開**: 進捗はすべてIndexedDBに保存されます。ブラウザがクラッシュしても、途中から再開可能です。
+*   **📥 JSONLエクスポート**: ファインチューニングにそのまま使える `.jsonl` 形式（`{"text": "..."}`）で結果を出力。
+*   **🔌 柔軟なバックエンド**:
+    *   **Google Gemini**: 高速かつ高品質なクラウド処理。
+    *   **ローカル LLM**: Ollama, LM Studio, vLLM などのOpenAI互換APIをサポート。
 
-### 始め方
+### 🚀 始め方
 
-#### 必須条件
-*   Node.js (v18 以上)
+#### 必須環境
+*   Node.js (v18以上)
 *   npm または yarn
 
-#### インストール
-1.  リポジトリをクローンします:
+#### インストール方法
+1.  **リポジトリのクローン**
     ```bash
     git clone https://github.com/nRyan7/CleanLab.git
     cd CleanLab
     ```
-2.  依存関係をインストールします:
+2.  **依存関係のインストール**
     ```bash
     npm install
     ```
 
-#### 設定
-アプリ内の **Settings (設定)** メニューでAIプロバイダーを設定できます。
-*   **Gemini API**: 有効なAPIキーが必要です。
-*   **Local/Generic API**: OpenAI互換のエンドポイント（例：LM Studio, Ollama, vLLM）に対応しています。
-
 #### 使い方
-1.  開発サーバーを起動します:
+1.  **アプリの起動**
     ```bash
     npm run dev
     ```
-2.  ブラウザで `http://localhost:5173` を開きます。
-3.  **設定**: "Settings" を開き、APIキーとシステムプロンプトを設定します。
-4.  **アップロード**: "Upload Files" または "Upload Folder" をクリックして、生データを追加します。
-5.  **実行**: "Run" ボタンをクリックして、処理キューを開始します。
-6.  **ダウンロード**: 完了後、"Download" ボタンをクリックして、精製されたデータセットを取得します。
+2.  **ブラウザで開く**: `http://localhost:5173` にアクセス。
+3.  **設定 (Settings)**:
+    *   **Gemini**: APIキーを入力。
+    *   **Local**: ローカルサーバーのURLを設定 (例: `http://localhost:11434/v1`)。
+4.  **データの読み込み**: ファイルまたはフォルダをドラッグ＆ドロップ。
+5.  **実行**: **Start Processing** をクリック。
+6.  **保存**: 完了後、**Download** をクリックして `.jsonl` を取得。
+
+### ⚠️ ライセンスと商用利用について
+本プロジェクトは**学習および研究目的**でのみ使用できます。
+**商用利用**をご希望の場合は、必ず作者まで連絡し許諾を得てください: **ranrinhk@gmail.com**
+
+---
+&copy; 2025 CleanLab Project. Built for the Open Source AI Community.

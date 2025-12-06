@@ -1,5 +1,5 @@
 export const DEFAULT_PROMPT = `
-请重写以下文章，使其更具吸引力，保持原意但优化文笔：
+Please rewrite the following article to make it more engaging, maintaining the original meaning but optimizing the writing style:
 
 {TEXT}
 `;

@@ -18,6 +18,7 @@ interface HeaderProps {
     onToggleProcessing: () => void;
     onClearAll: () => void;
     onDownloadResults?: () => void; // New download handler
+    currentModelName: string;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -34,7 +35,8 @@ export const Header: React.FC<HeaderProps> = ({
     onFolderUpload,
     onToggleProcessing,
     onClearAll,
-    onDownloadResults
+    onDownloadResults,
+    currentModelName
 }) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const folderInputRef = useRef<HTMLInputElement>(null);
@@ -51,18 +53,28 @@ export const Header: React.FC<HeaderProps> = ({
                 {/* Vertical Divider */}
                 <div className="h-6 w-px bg-white/10" />
 
-                {/* Start/Pause Button - Always visible on left as requested */}
-                <button onClick={onToggleProcessing} disabled={stopRequested || !hasJobs}
-                    className={`flex items-center gap-2 px-4 py-1.5 rounded-lg text-sm font-medium text-white shadow-sm transition-all whitespace-nowrap border border-white/5 ${isProcessing
-                        ? 'bg-amber-600/20 text-amber-500 hover:bg-amber-600/30'
-                        : 'bg-indigo-600 hover:bg-indigo-500 shadow-indigo-500/20 disabled:opacity-50 disabled:bg-zinc-800 disabled:text-zinc-500 disabled:shadow-none'
-                        }`}>
-                    {isProcessing ? (
-                        <><Icons.Pause className="w-4 h-4" /> 暂停处理</>
-                    ) : (
-                        <><Icons.Play className="w-4 h-4" /> 开始处理</>
-                    )}
-                </button>
+                <div className="flex items-center gap-3">
+                    {/* Start/Pause Button - Always visible on left as requested */}
+                    <button onClick={onToggleProcessing} disabled={stopRequested || !hasJobs}
+                        className={`flex items-center gap-2 px-4 py-1.5 rounded-lg text-sm font-medium text-white shadow-sm transition-all whitespace-nowrap border border-white/5 ${isProcessing
+                            ? 'bg-amber-600/20 text-amber-500 hover:bg-amber-600/30'
+                            : 'bg-indigo-600 hover:bg-indigo-500 shadow-indigo-500/20 disabled:opacity-50 disabled:bg-zinc-800 disabled:text-zinc-500 disabled:shadow-none'
+                            }`}>
+                        {isProcessing ? (
+                            <><Icons.Pause className="w-4 h-4" /> Pause Processing</>
+                        ) : (
+                            <><Icons.Play className="w-4 h-4" /> Start Processing</>
+                        )}
+                    </button>
+
+                    {/* Model Name Badge */}
+                    <div className="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-800 rounded-lg border border-white/5 shadow-sm">
+                        <Icons.Cpu className="w-3.5 h-3.5 text-indigo-400" />
+                        <span className="text-xs font-medium text-zinc-300 max-w-[150px] truncate">
+                            {currentModelName || 'No Model Selected'}
+                        </span>
+                    </div>
+                </div>
             </div>
 
             {/* Center Group: Import & Prompt */}
@@ -77,19 +89,30 @@ export const Header: React.FC<HeaderProps> = ({
                 {/* Center Group: Import & Prompt */}
                 <div className="flex items-center gap-1 bg-zinc-800/50 rounded-lg p-1 border border-white/5 flex-shrink-0">
                     <button onClick={() => fileInputRef.current?.click()} disabled={isUploading || isProcessing}
-                        className="flex items-center gap-2 px-3 py-1.5 text-zinc-400 hover:text-indigo-400 hover:bg-white/5 rounded-md transition-all text-sm font-medium disabled:opacity-50 whitespace-nowrap" title="导入文件">
+                        className="flex items-center gap-2 px-3 py-1.5 text-zinc-400 hover:text-indigo-400 hover:bg-white/5 rounded-md transition-all text-sm font-medium disabled:opacity-50 whitespace-nowrap" title="Import Files">
                         <Icons.Upload className="w-4 h-4" />
-                        文件
+                        Files
                     </button>
                     <button onClick={() => folderInputRef.current?.click()} disabled={isUploading || isProcessing}
-                        className="flex items-center gap-2 px-3 py-1.5 text-zinc-400 hover:text-indigo-400 hover:bg-white/5 rounded-md transition-all text-sm font-medium disabled:opacity-50 whitespace-nowrap" title="导入文件夹">
+                        className="flex items-center gap-2 px-3 py-1.5 text-zinc-400 hover:text-indigo-400 hover:bg-white/5 rounded-md transition-all text-sm font-medium disabled:opacity-50 whitespace-nowrap" title="Import Folder">
                         <Icons.Folder className="w-4 h-4" />
-                        文件夹
+                        Folder
+                    </button>
+
+                    <div className="w-px h-4 bg-white/10 mx-1"></div>
+
+                    <button onClick={onOpenCleaner} className="flex items-center gap-2 px-3 py-1.5 text-zinc-400 hover:text-indigo-400 hover:bg-white/5 rounded-md transition-all text-sm font-medium whitespace-nowrap" title="Dataset Cleaner">
+                        <Icons.Wand className="w-4 h-4" />
+                        Cleaner
+                    </button>
+                    <button onClick={onOpenSplitter} className="flex items-center gap-2 px-3 py-1.5 text-zinc-400 hover:text-indigo-400 hover:bg-white/5 rounded-md transition-all text-sm font-medium whitespace-nowrap" title="Corpus Splitter">
+                        <Icons.Scissors className="w-4 h-4" />
+                        Splitter
                     </button>
                     <div className="w-px h-4 bg-white/10 mx-1"></div>
-                    <button onClick={onOpenPrompt} className="flex items-center gap-2 px-3 py-1.5 text-zinc-400 hover:text-indigo-400 hover:bg-white/5 rounded-md transition-all text-sm font-medium whitespace-nowrap" title="设置提示词">
+                    <button onClick={onOpenPrompt} className="flex items-center gap-2 px-3 py-1.5 text-zinc-400 hover:text-indigo-400 hover:bg-white/5 rounded-md transition-all text-sm font-medium whitespace-nowrap" title="Set Prompt">
                         <Icons.FilePen className="w-4 h-4" />
-                        提示词
+                        Prompt
                     </button>
 
                     {isUploading && (
@@ -108,17 +131,17 @@ export const Header: React.FC<HeaderProps> = ({
                 {/* Action Buttons */}
                 <div className="flex items-center gap-2">
                     {hasJobs && onDownloadResults && (
-                        <button onClick={onDownloadResults} className="flex items-center gap-2 px-3 py-1.5 text-emerald-400 hover:bg-emerald-500/10 rounded-lg border border-transparent hover:border-emerald-500/20 transition-all text-sm font-medium" title="下载结果">
+                        <button onClick={onDownloadResults} className="flex items-center gap-2 px-3 py-1.5 text-emerald-400 hover:bg-emerald-500/10 rounded-lg border border-transparent hover:border-emerald-500/20 transition-all text-sm font-medium" title="Download Results">
                             <Icons.Download className="w-4 h-4" />
-                            下载
+                            Download
                         </button>
                     )}
 
                     {hasJobs && (
                         <button onClick={onClearAll} disabled={isProcessing}
-                            className="flex items-center gap-2 px-3 py-1.5 text-red-400 hover:bg-red-500/10 rounded-lg border border-transparent hover:border-red-500/20 transition-all text-sm font-medium disabled:opacity-50 whitespace-nowrap" title="清空任务">
+                            className="flex items-center gap-2 px-3 py-1.5 text-red-400 hover:bg-red-500/10 rounded-lg border border-transparent hover:border-red-500/20 transition-all text-sm font-medium disabled:opacity-50 whitespace-nowrap" title="Clear Jobs">
                             <Icons.Trash className="w-4 h-4" />
-                            清空
+                            Clear
                         </button>
                     )}
                 </div>
@@ -127,14 +150,7 @@ export const Header: React.FC<HeaderProps> = ({
 
                 {/* System Tools */}
                 <div className="flex items-center gap-1 bg-zinc-800/50 p-1 rounded-lg border border-white/5">
-                    <button onClick={onOpenCleaner} className="p-2 text-zinc-500 hover:text-purple-400 hover:bg-white/5 rounded-md transition-colors" title="数据清洗">
-                        <Icons.Wand className="w-4 h-4" />
-                    </button>
-                    <button onClick={onOpenSplitter} className="p-2 text-zinc-500 hover:text-purple-400 hover:bg-white/5 rounded-md transition-colors" title="语料拆分">
-                        <Icons.Scissors className="w-4 h-4" />
-                    </button>
-                    <div className="w-px h-4 bg-white/10 mx-1"></div>
-                    <button onClick={onOpenSettings} className="p-2 text-zinc-500 hover:text-zinc-300 hover:bg-white/5 rounded-md transition-colors" title="设置">
+                    <button onClick={onOpenSettings} className="p-2 text-zinc-500 hover:text-zinc-300 hover:bg-white/5 rounded-md transition-colors" title="Settings">
                         <Icons.Settings className="w-4 h-4" />
                     </button>
                 </div>

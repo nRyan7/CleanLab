@@ -1,0 +1,5 @@
+{
+  "name": "CleanLab",
+  "description": "CleanLab: 基于AI的文本处理工具，支持批量改写、格式转换和内容校验。",
+  "requestFramePermissions": []
+}

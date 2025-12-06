@@ -1,0 +1,4 @@
+{text: This is the first article. It has some content.}
+{text: This is the second article.
+It spans multiple lines.}
+{text: Third article with special chars: !@#$}
